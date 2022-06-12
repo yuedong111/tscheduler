@@ -1,17 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gofrs/uuid"
 
 )
 
-func stopTaskAfter10Seconds(job *Job) {
+func stopTaskAfter10Minites(job *Job) {
 	timer := time.NewTimer(10 * time.Second)
 	defer timer.Stop()
 	<-timer.C
 	job.Stop()
+	fmt.Println("stopped")
 }
 
 func main() {
@@ -25,6 +27,6 @@ func main() {
 	at := NewAt()
 	at.AddJob(onceJob)
 	at.AddJob(cronJob)
-	go stopTaskAfter10Seconds(cronJob)
+	go stopTaskAfter10Minites(cronJob)
 	at.wait()
 }
