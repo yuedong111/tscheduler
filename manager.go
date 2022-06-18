@@ -65,7 +65,7 @@ func (a *At) runJob(job *Job) {
 	job.shutdownCh = make(chan struct{})
 	timer := time.NewTimer(at.Sub(now))
 	defer timer.Stop()
-	for {
+	if job.jobType == "once" {
 		select {
 		case <-timer.C:
 			a.runAction(job)
@@ -77,6 +77,26 @@ func (a *At) runJob(job *Job) {
 				Time("at", job.at).
 				Msg("run: canceled")
 			job.canceled = true
+		}
+	} else {
+		var status bool = false
+		for {
+			select {
+			case <-timer.C:
+				a.runAction(job)
+				job.done = true
+
+			case <-job.shutdownCh:
+				a.logger.Info().
+					Str("id", job.ID.String()).
+					Time("at", job.at).
+					Msg("run: canceled")
+				job.canceled = true
+				status = true
+			}
+			if status {
+				break
+			}
 		}
 	}
 }

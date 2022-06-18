@@ -7,8 +7,8 @@ import (
 
 )
 
-func stopTaskAfter10Seconds(job *Job) {
-	timer := time.NewTimer(10 * time.Second)
+func stopTaskAfter20Seconds(job *Job) {
+	timer := time.NewTimer(20 * time.Second)
 	defer timer.Stop()
 	<-timer.C
 	job.Stop()
@@ -25,6 +25,6 @@ func main() {
 	at := NewAt()
 	at.AddJob(onceJob)
 	at.AddJob(cronJob)
-	go stopTaskAfter10Seconds(cronJob)
+	go stopTaskAfter20Seconds(cronJob)
 	at.wait()
 }
